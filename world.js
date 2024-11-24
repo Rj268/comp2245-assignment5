@@ -1,21 +1,29 @@
-document.getElementById('lookup').addEventListener('click', function () {
-    // Get the value from the input field
-    const country = document.getElementById('country').value;
+document.addEventListener('DOMContentLoaded', function () {
+    // Get references to the input field and button
+    const countryInput = document.getElementById('country');
+    const lookupButton = document.getElementById('lookup');
+    const resultDiv = document.getElementById('result');
 
-    // Create an AJAX request
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `world.php?country=${country}`, true);
+    // Add click event listener to the Lookup button
+    lookupButton.addEventListener('click', function () {
+        // Get the value entered in the search field
+        const country = countryInput.value.trim();
 
-    // Define what happens when the request is complete
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            // Insert the response into the 'result' div
-            document.getElementById('result').innerHTML = xhr.responseText;
-        } else {
-            console.error('Request failed.');
-        }
-    };
-
-    // Send the request
-    xhr.send();
+        // Perform an AJAX request
+        fetch(`world.php?country=${encodeURIComponent(country)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(data => {
+                // Display the results in the result div
+                resultDiv.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                resultDiv.innerHTML = 'An error occurred while fetching the data.';
+            });
+    });
 });
